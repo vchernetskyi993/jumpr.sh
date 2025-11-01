@@ -52,7 +52,7 @@ function focus-window() {
         ;;
     app:*)
         appid="${id#app:}"
-        gtk-launch "$appid"
+        setsid nohup gtk-launch "$appid" >/dev/null 2>&1
         ;;
     esac
 }
