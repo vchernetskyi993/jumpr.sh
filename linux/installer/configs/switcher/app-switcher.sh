@@ -62,7 +62,9 @@ function search-prompt() {
           fi
         '"
 
-    fzf --accept-nth=1 -d ',' --with-nth=2 --tiebreak=index
+    fzf --accept-nth=1 -d ',' --with-nth=2 \
+        --tiebreak=index \
+        --header "App Switcher" --header-first
 }
 
 function focus-window() {
