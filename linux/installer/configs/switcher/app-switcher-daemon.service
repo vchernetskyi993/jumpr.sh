@@ -1,0 +1,16 @@
+[Unit]
+Description=App Switcher Daemon
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/kitty -1 \
+  --start-as=hidden \
+  -o font_size=20 \
+  --instance-group=app-switcher
+Environment=DISPLAY=%I
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
