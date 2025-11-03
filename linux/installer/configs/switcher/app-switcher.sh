@@ -53,6 +53,7 @@ function search-prompt() {
 
     # Vim Bindings
     export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
+        --bind 'start:unbind(j,k,i)' \
         --bind 'j:down,k:up,i:show-input+unbind(j,k,i)' \
         --bind 'esc,ctrl-c:transform:
           if [[ \$FZF_INPUT_STATE = enabled ]]; then
