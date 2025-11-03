@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Potential Improvements:
+# * Sort windows by last activation.
+#   * Pre-select pre-last.
 # * Close window from switcher
 # * Use for common system actions:
 #   * Shut down
