@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Potential Improvements:
-# * Treat [ as delimiter/space to sort win: [telegram.. before app: telegram..
 # * Sort windows by last activation.
 #   * Pre-select pre-last.
 # * Close window from switcher
@@ -11,6 +10,7 @@
 #   * Logout
 #   * Do not disturb
 # * Close switcher on lost focus
+# * Create custom icon
 
 function main() {
     list-all |
@@ -43,7 +43,7 @@ function list-windows() {
         --object-path /org/gnome/Shell/Extensions/Windows \
         --method org.gnome.Shell.Extensions.Windows.List |
         sed "s/^('\(.*\)',)$/\1/" |
-        jq -r '.[] | select(.title != "app-switcher") | "win:\(.id),win: [\(.wm_class)] \(.title)"'
+        jq -r '.[] | select(.title != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"'
 }
 
 function search-prompt() {
