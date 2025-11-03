@@ -10,6 +10,7 @@
 #   * Reboot
 #   * Logout
 #   * Do not disturb
+# * Close switcher on lost focus
 
 function main() {
     list-all |
