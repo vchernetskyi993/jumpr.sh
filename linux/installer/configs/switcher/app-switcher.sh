@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Potential Improvements:
-# * Pre-select pre-last window.
 # * Close window from switcher
 # * Use for common system actions:
 #   * Shut down
@@ -43,7 +42,12 @@ function list-windows() {
         --method org.gnome.Shell.Extensions.Windows.List |
         sed "s/^('\(.*\)',)$/\1/" |
         jq -r '.[] | select(.title != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
-        tac
+        tac |
+        {
+            read first
+            cat
+            echo "$first"
+        }
 }
 
 function search-prompt() {
