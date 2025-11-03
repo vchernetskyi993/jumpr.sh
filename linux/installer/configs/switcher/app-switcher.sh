@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Potential Improvements:
+# * Treat [ as delimiter/space to sort win: [telegram.. before app: telegram..
 # * Sort windows by last activation.
 #   * Pre-select pre-last.
 # * Close window from switcher
