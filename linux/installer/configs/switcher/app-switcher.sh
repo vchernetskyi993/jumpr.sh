@@ -9,9 +9,15 @@
 #   * Do not disturb
 # * Close switcher on lost focus
 # * Create custom icon
+# * Search launchers by keywords and name
+#   * Make keywords visible but "greyed out"
 
 function main() {
-    list-all |
+    list-all | {
+        read first
+        cat
+        echo "$first"
+    } |
         search-prompt |
         focus-window
 }
@@ -42,12 +48,7 @@ function list-windows() {
         --method org.gnome.Shell.Extensions.Windows.List |
         sed "s/^('\(.*\)',)$/\1/" |
         jq -r '.[] | select(.title != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
-        tac |
-        {
-            read first
-            cat
-            echo "$first"
-        }
+        tac
 }
 
 function search-prompt() {
