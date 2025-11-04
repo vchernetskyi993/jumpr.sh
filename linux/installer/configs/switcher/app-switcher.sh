@@ -13,11 +13,7 @@
 #   * Make keywords visible but "greyed out"
 
 function main() {
-    list-all | {
-        read first
-        cat
-        echo "$first"
-    } |
+    list-all |
         search-prompt |
         focus-window
 }
@@ -47,8 +43,9 @@ function list-windows() {
         --object-path /org/gnome/Shell/Extensions/Windows \
         --method org.gnome.Shell.Extensions.Windows.List |
         sed "s/^('\(.*\)',)$/\1/" |
-        jq -r '.[] | select(.title != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
-        tac
+        jq -r '.[] | select(.wm_class != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
+        tac |
+        tail -n +2
 }
 
 function search-prompt() {
