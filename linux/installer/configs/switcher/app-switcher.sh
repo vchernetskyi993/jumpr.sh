@@ -1,20 +1,29 @@
 #!/bin/bash
 
 # Potential Improvements:
-# * Close window from switcher
 # * Close switcher on lost focus
 # * Create custom icon
+
+export CACHE_DIR=$HOME/.cache/app-switcher
+export APPS_CACHE=$CACHE_DIR/apps.list
 
 function main() {
     list-all |
         search-prompt |
-        focus-window
+        process-selection
+    clean-caches
 }
 
 function list-all() {
     list-windows
-    list-applications
     list-commands
+
+    if [[ ! -s "$APPS_CACHE" ]]; then
+        mkdir -p "$CACHE_DIR"
+        list-applications | tee "$APPS_CACHE"
+    else
+        cat "$APPS_CACHE"
+    fi
 }
 
 function list-applications() {
@@ -35,16 +44,17 @@ function list-applications() {
 }
 
 function list-windows() {
-    gdbus call --session \
-        --dest org.gnome.Shell \
-        --object-path /org/gnome/Shell/Extensions/Windows \
-        --method org.gnome.Shell.Extensions.Windows.List |
+    echo "Retrieving windows" >>/tmp/app-switcher-log.txt
+    window-command List |
         sed 's/\\\"/\"/g' |
         sed "s/^(\(.*\),)$/\1/" |
         sed 's/^.\(.*\).$/\1/' |
         jq -r '.[] | select(.wm_class != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
-        tac |
-        tail -n +2
+        tac | {
+        read -r first
+        cat
+        echo "$first"
+    }
 }
 
 function list-commands() {
@@ -63,13 +73,20 @@ function search-prompt() {
         --color='info:#ff91c1,prompt:#ee5396,pointer:#f4a261' \
         --color='marker:#be95ff,spinner:#be95ff,header:#6e6f70'"
 
+    export -f close-window
+    export -f window-command
+
+    export -f list-all
+    export -f list-windows
+    export -f list-commands
+
     # Vim Bindings
     export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
-        --bind 'start:unbind(j,k,i)' \
-        --bind 'j:down,k:up,i:show-input+unbind(j,k,i)' \
+        --bind 'start:unbind(j,k,i,D)' \
+        --bind 'j:down,k:up,i:show-input+unbind(j,k,i,D),D:execute-silent(close-window {1})+reload(list-all)' \
         --bind 'esc,ctrl-c:transform:
           if [[ \$FZF_INPUT_STATE = enabled ]]; then
-            echo \"rebind(j,k,i)+hide-input\"
+            echo \"rebind(j,k,i,D)+hide-input\"
           else
             echo abort
           fi
@@ -81,7 +98,18 @@ function search-prompt() {
         --ansi
 }
 
-function focus-window() {
+function close-window() {
+    echo "Closing window '${1}'" >>/tmp/app-switcher-log.txt
+    if [[ "${1}" == win:* ]]; then
+        winid="${1#win:}"
+        window-command Close "$winid"
+        while window-command Details "$winid"; do
+            sleep 0.05
+        done
+    fi
+}
+
+function process-selection() {
     local sel
     read -r sel
 
@@ -92,10 +120,7 @@ function focus-window() {
     case "$sel" in
     win:*)
         winid="${sel#win:}"
-        gdbus call --session \
-            --dest org.gnome.Shell \
-            --object-path /org/gnome/Shell/Extensions/Windows \
-            --method org.gnome.Shell.Extensions.Windows.Activate "$winid"
+        window-command Activate "$winid"
         ;;
     app:*)
         appid="${sel#app:}"
@@ -125,4 +150,17 @@ function focus-window() {
     esac
 }
 
-[[ "${BASH_SOURCE[0]}" != "${0}" ]] || main $@
+function window-command() {
+    local method=$1
+    shift
+    gdbus call --session \
+        --dest org.gnome.Shell \
+        --object-path /org/gnome/Shell/Extensions/Windows \
+        --method org.gnome.Shell.Extensions.Windows."$method" "$@"
+}
+
+function clean-caches() {
+    rm "$APPS_CACHE"
+}
+
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || main "$@"
