@@ -28,12 +28,15 @@ function list-applications() {
     local data_dirs="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
     local all_dirs="$data_home:$data_dirs"
 
-    # Use find to list all .desktop files, remove suffix & duplicates
     echo "$all_dirs" | tr ':' '\n' | while read -r dir; do
-        find "$dir/applications" -type f -name '*.desktop' \
-            -exec basename {} .desktop \; 2>/dev/null
-    done | sort -u | while read -r app; do
-        echo "app:${app},app: ${app}"
+        find "$dir/applications" -type f -name '*.desktop'
+    done | awk -F/ '!seen[$NF]++' | while read -r desktop; do
+        id=$(basename -s .desktop "$desktop")
+        name=$(grep -m1 '^Name=' "$desktop" | cut -d= -f2-)
+        keywords=$(grep -m1 '^Keywords=' "$desktop" | cut -d= -f2-)
+        printf "app:%s,app: [ %s ] %s%b\n" \
+            "$id" "$id" "$name" \
+            "${keywords:+ \033[90m# ${keywords}\033[0m}"
     done
 }
 
@@ -73,7 +76,8 @@ function search-prompt() {
 
     fzf --accept-nth=1 -d ',' --with-nth=2 \
         --tiebreak=index \
-        --header "App Switcher" --header-first
+        --header "App Switcher" --header-first \
+        --ansi
 }
 
 function focus-window() {
