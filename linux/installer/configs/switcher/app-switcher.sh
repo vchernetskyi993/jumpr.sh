@@ -2,15 +2,8 @@
 
 # Potential Improvements:
 # * Close window from switcher
-# * Use for common system actions:
-#   * Shut down
-#   * Reboot
-#   * Logout
-#   * Do not disturb
 # * Close switcher on lost focus
 # * Create custom icon
-# * Search launchers by keywords and name
-#   * Make keywords visible but "greyed out"
 
 function main() {
     list-all |
@@ -21,6 +14,7 @@ function main() {
 function list-all() {
     list-windows
     list-applications
+    list-commands
 }
 
 function list-applications() {
@@ -53,6 +47,13 @@ function list-windows() {
         tail -n +2
 }
 
+function list-commands() {
+    printf "cmd:shutdown,cmd: Shutdown\n"
+    printf "cmd:restart,cmd: Restart \033[90m# Reboot\033[0m\n"
+    printf "cmd:logout,cmd: Logout\n"
+    printf "cmd:notifications,cmd: Toggle notifications \033[90m# Do not disturb\033[0m\n"
+}
+
 function search-prompt() {
     # TODO: setup on login
     # Theme
@@ -81,24 +82,45 @@ function search-prompt() {
 }
 
 function focus-window() {
-    local id
-    read -r id
+    local sel
+    read -r sel
 
-    if [[ -z "$id" ]]; then
+    if [[ -z "$sel" ]]; then
         return
     fi
 
-    case "$id" in
+    case "$sel" in
     win:*)
-        winid="${id#win:}"
+        winid="${sel#win:}"
         gdbus call --session \
             --dest org.gnome.Shell \
             --object-path /org/gnome/Shell/Extensions/Windows \
             --method org.gnome.Shell.Extensions.Windows.Activate "$winid"
         ;;
     app:*)
-        appid="${id#app:}"
+        appid="${sel#app:}"
         setsid nohup gtk-launch "$appid" >/dev/null 2>&1
+        ;;
+    cmd:*)
+        cmd="${sel#cmd:}"
+        case "$cmd" in
+        shutdown)
+            systemctl poweroff
+            ;;
+        restart)
+            systemctl reboot
+            ;;
+        logout)
+            gnome-session-quit --logout --no-prompt
+            ;;
+        notifications)
+            if [ "$(gsettings get org.gnome.desktop.notifications show-banners)" = "true" ]; then
+                gsettings set org.gnome.desktop.notifications show-banners false
+            else
+                gsettings set org.gnome.desktop.notifications show-banners true
+            fi
+            ;;
+        esac
         ;;
     esac
 }
