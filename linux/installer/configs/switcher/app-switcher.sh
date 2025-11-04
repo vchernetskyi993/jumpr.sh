@@ -42,8 +42,9 @@ function list-windows() {
         --dest org.gnome.Shell \
         --object-path /org/gnome/Shell/Extensions/Windows \
         --method org.gnome.Shell.Extensions.Windows.List |
-        sed "s/^('\(.*\)',)$/\1/" |
-        sed 's/\\\\\"/\\"/g' |
+        sed 's/\\\"/\"/g' |
+        sed "s/^(\(.*\),)$/\1/" |
+        sed 's/^.\(.*\).$/\1/' |
         jq -r '.[] | select(.wm_class != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
         tac |
         tail -n +2
