@@ -3,6 +3,7 @@
 # Potential Improvements:
 # * Close switcher on lost focus
 # * Create custom icon
+# * Icons for applications and windows
 
 export CACHE_DIR=$HOME/.cache/app-switcher
 export APPS_CACHE=$CACHE_DIR/apps.list
