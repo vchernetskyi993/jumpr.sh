@@ -2,8 +2,7 @@
 
 # Potential Improvements:
 # * Close switcher on lost focus
-# * Create custom icon
-# * Icons for applications and windows
+# * Override fzf options from outside
 
 export CACHE_DIR=$HOME/.cache/jumpr
 export APPS_CACHE=$CACHE_DIR/apps.list
@@ -121,11 +120,11 @@ function search-prompt() {
 
     # Vim Bindings
     export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
-        --bind 'start:unbind(j,k,i,D)' \
-        --bind 'j:down,k:up,i:show-input+unbind(j,k,i,D),D:execute-silent(close-window {1})+reload(list-all)' \
+        --bind 'start:unbind(j,k,i,D,G)' \
+        --bind 'j:down,k:up,i:show-input+unbind(j,k,i,D,G),D:execute-silent(close-window {1})+reload(list-all),G:first' \
         --bind 'esc,ctrl-c:transform:
           if [[ \$FZF_INPUT_STATE = enabled ]]; then
-            echo \"rebind(j,k,i,D)+hide-input\"
+            echo \"rebind(j,k,i,D,G)+hide-input\"
           else
             echo abort
           fi
