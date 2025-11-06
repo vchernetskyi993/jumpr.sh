@@ -16,15 +16,15 @@ function main() {
 }
 
 function list-all() {
-    list-windows
-    list-commands
+    list-windows | prefix ''
+    list-commands | prefix ''
 
     if [[ ! -s "$APPS_CACHE" ]]; then
         mkdir -p "$CACHE_DIR"
         list-applications | tee "$APPS_CACHE"
     else
         cat "$APPS_CACHE"
-    fi
+    fi | prefix '󰣆'
 }
 
 function list-applications() {
@@ -38,7 +38,7 @@ function list-applications() {
         id=$(basename -s .desktop "$desktop")
         name=$(grep -m1 '^Name=' "$desktop" | cut -d= -f2-)
         keywords=$(grep -m1 '^Keywords=' "$desktop" | cut -d= -f2-)
-        printf "app:%s,app: %s \033[90m# %s %s\033[0m\n" \
+        printf "app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n" \
             "$id" "$name" "$id" "$keywords"
     done
 }
@@ -51,7 +51,7 @@ function list-windows() {
         jq -r '
             .[] | 
                 select(.wm_class != "jumpr") |
-                "win:\(.id),win: \(.title) \u001b[90m# \(.wm_class)\u001b[0m"
+                "win:\(.id)\u001fwin: \(.title) \u001b[90m# \(.wm_class)\u001b[0m"
         ' |
         tac |
         {
@@ -62,10 +62,14 @@ function list-windows() {
 }
 
 function list-commands() {
-    printf "cmd:shutdown,cmd: Shutdown\n"
-    printf "cmd:restart,cmd: Restart \033[90m# Reboot\033[0m\n"
-    printf "cmd:logout,cmd: Logout\n"
-    printf "cmd:notifications,cmd: Toggle notifications \033[90m# Do not disturb\033[0m\n"
+    printf "cmd:shutdown\x1fcmd: Shutdown\n"
+    printf "cmd:restart\x1fcmd: Restart \033[90m# Reboot\033[0m\n"
+    printf "cmd:logout\x1fcmd: Logout\n"
+    printf "cmd:notifications\x1fcmd: Toggle notifications \033[90m# Do not disturb\033[0m\n"
+}
+
+function prefix() {
+    sed "s/\x1f/\x1f$1 /"
 }
 
 function search-prompt() {
@@ -96,7 +100,7 @@ function search-prompt() {
           fi
         '"
 
-    fzf --accept-nth=1 -d ',' --with-nth=2 \
+    fzf --accept-nth=1 -d $'\x1f' --with-nth=2 \
         --tiebreak=index \
         --header "Gnome Jumper" --header-first \
         --ansi --highlight-line --no-hscroll 
