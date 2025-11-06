@@ -80,18 +80,27 @@ function prefix() {
 }
 
 function symbol() {
-    declare -A symbols=(
-        [firefox]="󰈹"
-        [chrome]=""
-    )
-
-    for k in "${!symbols[@]}"; do
-        if [[ "${2,,}" == *$k* ]]; then
-            echo "${symbols[$k]}"
-            return 0
-        fi
-    done
-    echo "${1}"
+    case "${2,,}" in
+    *firefox*) printf "\033[38;5;208m󰈹" ;;
+    *teams*) printf "\033[38;5;135m󰊻" ;;
+    *chrome* | *chromium*) printf "\033[38;5;33m" ;;
+    *preferences*) printf "\033[38;5;75m" ;;
+    *file*) printf "\033[38;5;178m" ;;
+    *kitty* | *alacritty* | *console* | *terminal*) printf "\033[38;5;240m" ;;
+    *nvim*) printf "\033[38;5;120m" ;;
+    *telegram*) printf "\033[38;5;39m" ;;
+    *slack*) printf "\033[38;5;99m󰒱" ;;
+    *shutdown*) printf "\033[38;5;196m󰐥" ;;
+    *restart*) printf "\033[38;5;196m󰜉" ;;
+    *logout*) printf "\033[38;5;196m󰗽" ;;
+    *notification*) printf "\033[38;5;214m󰂚" ;;
+    *gnome*) printf "󰊬" ;;
+    *libreoffice*) printf "\033[38;5;70m" ;;
+    *vlc*) printf "\033[38;5;208m󰕼" ;;
+    *pdf*) printf "\033[38;5;160m" ;;
+    *) printf "\033[38;5;218m%s" "$1" ;;
+    esac
+    printf "\033[0m\n"
 }
 
 function search-prompt() {
