@@ -38,9 +38,8 @@ function list-applications() {
         id=$(basename -s .desktop "$desktop")
         name=$(grep -m1 '^Name=' "$desktop" | cut -d= -f2-)
         keywords=$(grep -m1 '^Keywords=' "$desktop" | cut -d= -f2-)
-        printf "app:%s,app: [ %s ] %s%b\n" \
-            "$id" "$id" "$name" \
-            "${keywords:+ \033[90m# ${keywords}\033[0m}"
+        printf "app:%s,app: %s \033[90m# %s %s\033[0m\n" \
+            "$id" "$name" "$id" "$keywords"
     done
 }
 
@@ -49,12 +48,17 @@ function list-windows() {
         sed 's/\\\"/\"/g' |
         sed "s/^(\(.*\),)$/\1/" |
         sed 's/^.\(.*\).$/\1/' |
-        jq -r '.[] | select(.wm_class != "jumpr") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
-        tac | {
-        read -r first
-        cat
-        echo "$first"
-    }
+        jq -r '
+            .[] | 
+                select(.wm_class != "jumpr") |
+                "win:\(.id),win: \(.title) \u001b[90m# \(.wm_class)\u001b[0m"
+        ' |
+        tac |
+        {
+            read -r first
+            cat
+            echo "$first"
+        }
 }
 
 function list-commands() {
@@ -68,10 +72,10 @@ function search-prompt() {
     # TODO: setup on login
     # Theme
     export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
-        --color='fg:#f2f4f8,bg:#161616,hl:#6e6f70' \
+        --color='fg:#f2f4f8,bg:#161616,hl:#be95ff' \
         --color='fg+:#f2f4f8,bg+:#2a2a2a,hl+:#be95ff' \
         --color='info:#ff91c1,prompt:#ee5396,pointer:#f4a261' \
-        --color='marker:#be95ff,spinner:#be95ff,header:#6e6f70'"
+        --color='marker:#be95ff,spinner:#be95ff,header:#be95ff'"
 
     export -f close-window
     export -f window-command
@@ -95,7 +99,7 @@ function search-prompt() {
     fzf --accept-nth=1 -d ',' --with-nth=2 \
         --tiebreak=index \
         --header "Gnome Jumper" --header-first \
-        --ansi
+        --ansi --highlight-line --no-hscroll 
 }
 
 function close-window() {
