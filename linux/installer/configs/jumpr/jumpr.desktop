@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Jumpr
+GenericName=Gnome Jumper
+Exec=kitty --class=jumpr -1 --instance-group=jumpr jumpr
+Type=Application
+Icon=jumpr.png
+Categories=Utility;
+StartupWMClass=jumpr

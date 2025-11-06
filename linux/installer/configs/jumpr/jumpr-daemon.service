@@ -1,5 +1,5 @@
 [Unit]
-Description=App Switcher Daemon
+Description=Gnome Jumper Daemon
 After=graphical-session.target
 
 [Service]
@@ -7,7 +7,7 @@ Type=simple
 ExecStart=/usr/bin/kitty -1 \
   --start-as=hidden \
   -o font_size=20 \
-  --instance-group=app-switcher
+  --instance-group=jumpr
 Environment=DISPLAY=%I
 Restart=on-failure
 RestartSec=2

@@ -5,7 +5,7 @@
 # * Create custom icon
 # * Icons for applications and windows
 
-export CACHE_DIR=$HOME/.cache/app-switcher
+export CACHE_DIR=$HOME/.cache/jumpr
 export APPS_CACHE=$CACHE_DIR/apps.list
 
 function main() {
@@ -45,12 +45,11 @@ function list-applications() {
 }
 
 function list-windows() {
-    echo "Retrieving windows" >>/tmp/app-switcher-log.txt
     window-command List |
         sed 's/\\\"/\"/g' |
         sed "s/^(\(.*\),)$/\1/" |
         sed 's/^.\(.*\).$/\1/' |
-        jq -r '.[] | select(.wm_class != "app-switcher") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
+        jq -r '.[] | select(.wm_class != "jumpr") | "win:\(.id),win: [ \(.wm_class) ] \(.title)"' |
         tac | {
         read -r first
         cat
@@ -95,12 +94,11 @@ function search-prompt() {
 
     fzf --accept-nth=1 -d ',' --with-nth=2 \
         --tiebreak=index \
-        --header "App Switcher" --header-first \
+        --header "Gnome Jumper" --header-first \
         --ansi
 }
 
 function close-window() {
-    echo "Closing window '${1}'" >>/tmp/app-switcher-log.txt
     if [[ "${1}" == win:* ]]; then
         winid="${1#win:}"
         window-command Close "$winid"
