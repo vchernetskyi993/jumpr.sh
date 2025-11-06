@@ -16,15 +16,15 @@ function main() {
 }
 
 function list-all() {
-    list-windows | prefix ''
-    list-commands | prefix ''
+    list-windows | prefix-symbol ''
+    list-commands | prefix-symbol ''
 
     if [[ ! -s "$APPS_CACHE" ]]; then
         mkdir -p "$CACHE_DIR"
         list-applications | tee "$APPS_CACHE"
     else
         cat "$APPS_CACHE"
-    fi | prefix '󰣆'
+    fi | prefix-symbol '󰣆'
 }
 
 function list-applications() {
@@ -68,8 +68,30 @@ function list-commands() {
     printf "cmd:notifications\x1fcmd: Toggle notifications \033[90m# Do not disturb\033[0m\n"
 }
 
+function prefix-symbol() {
+    while read -r in; do
+        prefix "$(symbol "$1" "$in")" "$in"
+    done
+}
+
 function prefix() {
-    sed "s/\x1f/\x1f$1 /"
+    sep=$'\x1f'
+    echo "${2//$sep/$sep$1 }"
+}
+
+function symbol() {
+    declare -A symbols=(
+        [firefox]="󰈹"
+        [chrome]=""
+    )
+
+    for k in "${!symbols[@]}"; do
+        if [[ "${2,,}" == *$k* ]]; then
+            echo "${symbols[$k]}"
+            return 0
+        fi
+    done
+    echo "${1}"
 }
 
 function search-prompt() {
@@ -103,7 +125,7 @@ function search-prompt() {
     fzf --accept-nth=1 -d $'\x1f' --with-nth=2 \
         --tiebreak=index \
         --header "Gnome Jumper" --header-first \
-        --ansi --highlight-line --no-hscroll 
+        --ansi --highlight-line --no-hscroll
 }
 
 function close-window() {
