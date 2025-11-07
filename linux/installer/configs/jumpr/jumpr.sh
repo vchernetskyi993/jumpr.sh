@@ -118,6 +118,10 @@ function search-prompt() {
     export -f list-windows
     export -f list-commands
 
+    export -f prefix-symbol
+    export -f prefix
+    export -f symbol
+
     # Vim Bindings
     export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
         --bind 'start:unbind(j,k,i,D,G)' \
