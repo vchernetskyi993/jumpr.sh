@@ -31,8 +31,10 @@ function list-applications() {
     local data_dirs="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
     local all_dirs="$data_home:$data_dirs"
 
-    echo "$all_dirs" | tr ':' '\n' | while read -r dir; do
-        find "$dir/applications" -type f -name '*.desktop'
+    echo "$all_dirs" | tr ':' '\n' | sed 's:/*$:/applications:' | while read -r dir; do
+        [[ -d "$dir" ]] && echo "$dir"
+    done | while read -r dir; do
+        find "$dir" -type f -name '*.desktop'
     done | awk -F/ '!seen[$NF]++' | while read -r desktop; do
         id=$(basename -s .desktop "$desktop")
         name=$(grep -m1 '^Name=' "$desktop" | cut -d= -f2-)
