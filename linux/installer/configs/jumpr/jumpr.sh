@@ -32,12 +32,13 @@ function list-applications() {
     local all_dirs="$data_home:$data_dirs"
 
     echo "$all_dirs" |
-        tr ':' '\n' |                       # split on ':'
-        sed 's:/*$:/applications:' |        # append /applications
-        filter is-dir |                     # remove non-existing directories
-        map list-desktop-files |            # list all desktop files
-        awk -F/ '!seen[$NF]++' |            # unique base names
-        xargs awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
+        tr ':' '\n' |                          # split on ':'
+        sed 's:/*$:/applications:' |           # append /applications
+        filter is-dir |                        # remove non-existing directories
+        map list-desktop-files |               # list all desktop files
+        awk -F/ '!seen[$NF]++' |               # unique base names
+        tr '\n' '\0' |                         # replace linebreak with null
+        xargs -0 awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
 }
 
 function list-desktop-files() {
