@@ -31,18 +31,42 @@ function list-applications() {
     local data_dirs="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
     local all_dirs="$data_home:$data_dirs"
 
-    echo "$all_dirs" | tr ':' '\n' | sed 's:/*$:/applications:' | while read -r dir; do
-        [[ -d "$dir" ]] && echo "$dir"
-    done | while read -r dir; do
-        find "$dir" -type f -name '*.desktop'
-    done | awk -F/ '!seen[$NF]++' | while read -r desktop; do
-        id=$(basename -s .desktop "$desktop")
-        name=$(grep -m1 '^Name=' "$desktop" | cut -d= -f2-)
-        keywords=$(grep -m1 '^Keywords=' "$desktop" | cut -d= -f2-)
-        printf "app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n" \
-            "$id" "$name" "$id" "$keywords"
-    done
+    echo "$all_dirs" |
+        tr ':' '\n' | # split on ':'
+        sed 's:/*$:/applications:' | # append /applications
+
+        while read -r dir; do
+            [[ -d "$dir" ]] && echo "$dir"
+        done | # remove non-existing directories
+
+        while read -r dir; do
+            find "$dir" -type f -name '*.desktop'
+        done | # list all desktop files
+
+        awk -F/ '!seen[$NF]++' | # unique base names
+        xargs awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
 }
+
+# AWK used to speed up, with pure Bash processing is ~10 times longer
+# shellcheck disable=SC2016
+PRINT_APPLICATIONS='
+    FNR == 1 {
+        id = FILENAME
+        sub(/.*\//, "", id)
+        sub(/\.desktop$/, "", id)
+        name = ""
+        keywords = ""
+    }
+    $1 == "Name" && !name {
+        name = $2
+    }
+    $1 == "Keywords" && !keywords {
+        keywords = $2
+    }
+    ENDFILE {
+        printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", id, name, id, keywords)
+    }
+'
 
 function list-windows() {
     window-command List |
