@@ -32,27 +32,25 @@ function list-applications() {
     local all_dirs="$data_home:$data_dirs"
 
     echo "$all_dirs" |
-        tr ':' '\n' | # split on ':'
-        sed 's:/*$:/applications:' | # append /applications
-
-        while read -r dir; do
-            [[ -d "$dir" ]] && echo "$dir"
-        done | # remove non-existing directories
-
-        while read -r dir; do
-            find "$dir" -type f -name '*.desktop'
-        done | # list all desktop files
-
-        awk -F/ '!seen[$NF]++' | # unique base names
+        tr ':' '\n' |                       # split on ':'
+        sed 's:/*$:/applications:' |        # append /applications
+        filter is-dir |                     # remove non-existing directories
+        map list-desktop-files |            # list all desktop files
+        awk -F/ '!seen[$NF]++' |            # unique base names
         xargs awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
+}
+
+function list-desktop-files() {
+    find "$1" -type f -name '*.desktop'
 }
 
 # AWK used to speed up, with pure Bash processing is ~10 times longer
 # shellcheck disable=SC2016
 PRINT_APPLICATIONS='
     FNR == 1 {
-        id = FILENAME
-        sub(/.*\//, "", id)
+        file = FILENAME
+        sub(/.*\//, "", file)
+        id = file
         sub(/\.desktop$/, "", id)
         name = ""
         keywords = ""
@@ -64,7 +62,7 @@ PRINT_APPLICATIONS='
         keywords = $2
     }
     ENDFILE {
-        printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", id, name, id, keywords)
+        printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", file, name, id, keywords)
     }
 '
 
@@ -228,6 +226,28 @@ function window-command() {
 
 function clean-caches() {
     rm "$APPS_CACHE"
+}
+
+function is-dir() {
+    [[ -d "$1" ]]
+}
+
+function filter() {
+    local predicate="$1"
+    # shellcheck disable=SC2329
+    function mapper() {
+        if "$predicate" "$1"; then
+            echo "$1"
+        fi
+    }
+    map mapper
+}
+
+function map() {
+    local f="$1"
+    while IFS= read -r item; do
+        "$f" "$item"
+    done
 }
 
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] || main "$@"
