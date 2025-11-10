@@ -122,6 +122,7 @@ function symbol() {
     *libreoffice*) printf "\033[38;5;70m" ;;
     *vlc*) printf "\033[38;5;208m󰕼" ;;
     *pdf*) printf "\033[38;5;160m" ;;
+    *keepassxc*) printf "\033[38;5;34m" ;;
     *) printf "\033[38;5;218m%s" "$1" ;;
     esac
     printf "\033[0m\n"
