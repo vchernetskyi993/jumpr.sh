@@ -1,0 +1,35 @@
+#!/bin/bash
+
+: "${STUB_ARGS:?STUB_ARGS must be set to a writable directory}"
+mkdir -p -- "$STUB_ARGS"
+
+args="$*"
+
+# Compute next call number from existing gdbus_args_* files
+shopt -s nullglob
+max=0
+for f in "$STUB_ARGS"/gdbus_args_*; do
+  base=${f##*/}           # gdbus_args_N
+  num=${base#gdbus_args_} # N
+  [[ $num =~ ^[0-9]+$ ]] && (( num > max )) && max=$num
+done
+next=$((max + 1))
+outfile="$STUB_ARGS/gdbus_args_$next"
+
+echo "$(basename "$0") $args" > "$outfile"
+
+case "$args" in
+  *List*)
+    echo "0x01234567 Window One"
+    echo "0x89abcdef Window Two"
+    exit 0
+    ;;
+  *Activate*)
+    echo "Activating..."
+    exit 0
+    ;;
+  *)
+    exit 1
+    ;;
+esac
+
