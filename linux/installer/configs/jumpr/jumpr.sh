@@ -20,10 +20,10 @@ function list-all() {
 
     if [[ ! -s "$APPS_CACHE" ]]; then
         mkdir -p "$CACHE_DIR"
-        list-applications | tee "$APPS_CACHE"
+        list-applications | prefix-symbol '󰣆' | tee "$APPS_CACHE"
     else
         cat "$APPS_CACHE"
-    fi | prefix-symbol '󰣆'
+    fi 
 }
 
 function list-applications() {
