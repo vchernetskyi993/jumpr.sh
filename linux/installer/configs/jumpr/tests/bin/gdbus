@@ -1,35 +1,37 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-: "${STUB_ARGS:?STUB_ARGS must be set to a writable directory}"
-mkdir -p -- "$STUB_ARGS"
+import os
+import sys
+from pathlib import Path
 
-args="$*"
 
-# Compute next call number from existing gdbus_args_* files
-shopt -s nullglob
-max=0
-for f in "$STUB_ARGS"/gdbus_args_*; do
-  base=${f##*/}           # gdbus_args_N
-  num=${base#gdbus_args_} # N
-  [[ $num =~ ^[0-9]+$ ]] && (( num > max )) && max=$num
-done
-next=$((max + 1))
-outfile="$STUB_ARGS/gdbus_args_$next"
+def main():
+    out_dir = _out_dir()
+    script_name = Path(sys.argv[0]).name
+    args = " ".join(sys.argv[1:])
+    args_file = out_dir / f"{script_name}_args"
 
-echo "$(basename "$0") $args" > "$outfile"
+    with args_file.open("a") as fh:
+        _ = fh.write(f"{script_name} {args}\n")
 
-case "$args" in
-  *List*)
-    echo "0x01234567 Window One"
-    echo "0x89abcdef Window Two"
-    exit 0
-    ;;
-  *Activate*)
-    echo "Activating..."
-    exit 0
-    ;;
-  *)
-    exit 1
-    ;;
-esac
+    mocks_dir = _mocks_dir()
+    # parse {mocks_dir}/{script_name}.yml|yaml if exists
+    # for each key in args: print value
 
+
+def _out_dir() -> Path:
+    stub_args = os.environ.get("OUT_DIR")
+    if not stub_args:
+        print("OUT_DIR must be set to a writable directory", file=sys.stderr)
+        sys.exit(1)
+
+    return Path(stub_args)
+
+
+def _mocks_dir() -> Path | None:
+    stub_args = os.environ.get("MOCKS_DIR")
+    return Path(stub_args) if stub_args else None
+
+
+if __name__ == "__main__":
+    main()
