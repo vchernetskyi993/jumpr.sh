@@ -3,6 +3,7 @@
 import os
 import sys
 from pathlib import Path
+import yaml
 
 
 def main():
@@ -10,14 +11,31 @@ def main():
     script_name = Path(sys.argv[0]).name
     args = " ".join(sys.argv[1:])
     args_file = out_dir / f"{script_name}_args"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     with args_file.open("a") as fh:
-        _ = fh.write(f"{script_name} {args}\n")
+        _ = fh.write(f"{args}\n")
 
+    mocks = _load_yaml_for_script(script_name)
+    for call in mocks.keys():
+        if call in args:
+            print(mocks[call])
+
+def _load_yaml_for_script(script_name: str) -> dict[str, str]:
     mocks_dir = _mocks_dir()
-    # parse {mocks_dir}/{script_name}.yml|yaml if exists
-    # for each key in args: print value
+    if not mocks_dir:
+        return {}
 
+    candidates = [
+        mocks_dir / f"{script_name}.yml",
+        mocks_dir / f"{script_name}.yaml",
+    ]
+
+    for p in candidates:
+        if p.is_file():
+            with p.open("r", encoding="utf-8") as f:
+                return yaml.safe_load(f) or {}
+    return {}
 
 def _out_dir() -> Path:
     stub_args = os.environ.get("OUT_DIR")
