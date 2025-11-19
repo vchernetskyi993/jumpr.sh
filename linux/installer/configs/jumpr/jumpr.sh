@@ -55,6 +55,7 @@ PRINT_APPLICATIONS='
         sub(/\.desktop$/, "", id)
         name = ""
         keywords = ""
+        nodisplay = 0
     }
     $1 == "Name" && !name {
         name = $2
@@ -62,8 +63,13 @@ PRINT_APPLICATIONS='
     $1 == "Keywords" && !keywords {
         keywords = $2
     }
+    $1 == "NoDisplay" && $2 == "true" {
+        nodisplay = 1
+    }
     ENDFILE {
-        printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", file, name, id, keywords)
+        if (!nodisplay) {
+            printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", file, name, id, keywords)
+        }
     }
 '
 
