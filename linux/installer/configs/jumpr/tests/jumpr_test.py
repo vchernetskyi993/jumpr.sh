@@ -14,10 +14,10 @@ def test_switch_windows(
 ) -> None:
     # given
     mocks = SystemMocks(tmp_path, monkeypatch, request)
-    gdbus = mocks.mock_binary("gdbus")
+    gdbus = mocks.binary("gdbus")
     monkeypatch.setenv("FZF_DEFAULT_OPTS", "--query 'My Window' --exact -1 -0")
-    # mock applications
-    _ = mocks.mock_home()
+    # TODO: mock applications
+    mocks.home()
 
     # when
     result = subprocess.run(["../jumpr.sh"], capture_output=True, text=True)
@@ -73,7 +73,7 @@ class SystemMocks:
     monkeypatch: MonkeyPatch
     request: FixtureRequest
 
-    def mock_binary(self, executable: str) -> Mock:
+    def binary(self, executable: str) -> Mock:
         bin_dir = self.tmp_path / "bin"
         bin_dir.mkdir(exist_ok=True)
         _ = shutil.copy2("./bin/stub", bin_dir / executable)
@@ -83,8 +83,7 @@ class SystemMocks:
         self.monkeypatch.setenv("MOCKS_DIR", f"./mocks/{self.request.node.name}")
         return Mock(out_path, executable)
 
-    def mock_home(self) -> Path:
+    def home(self) -> None:
         home = self.tmp_path / "home"
         home.mkdir()
         self.monkeypatch.setenv("HOME", str(home))
-        return home
