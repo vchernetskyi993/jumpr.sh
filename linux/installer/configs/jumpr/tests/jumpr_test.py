@@ -1,23 +1,18 @@
 from dataclasses import dataclass
-import os
-from pathlib import Path
-import shutil
 import subprocess
 
 import simple_parsing
-from pytest import MonkeyPatch, FixtureRequest
 from simple_parsing.utils import DataclassT
 
+from conftest import SystemMocks
 
-def test_switch_windows(
-    monkeypatch: MonkeyPatch, tmp_path: Path, request: FixtureRequest
-) -> None:
+
+def test_switch_windows(system_mocks: SystemMocks) -> None:
     # given
-    mocks = SystemMocks(tmp_path, monkeypatch, request)
-    gdbus = mocks.binary("gdbus")
-    monkeypatch.setenv("FZF_DEFAULT_OPTS", "--query 'My Window' --exact -1 -0")
+    gdbus = system_mocks.binary("gdbus")
+    system_mocks.setenv("FZF_DEFAULT_OPTS", "--query 'My Window' --exact -1 -0")
     # TODO: mock applications
-    mocks.home()
+    system_mocks.home()
 
     # when
     result = subprocess.run(["../jumpr.sh"], capture_output=True, text=True)
@@ -55,35 +50,3 @@ def _activate_window(window_id: int) -> GDBusArgs:
         method="org.gnome.Shell.Extensions.Windows.Activate",
         window_id=window_id,
     )
-
-
-@dataclass
-class Mock:
-    out_path: Path
-    executable: str
-
-    def received_args(self) -> list[str]:
-        with open(self.out_path / f"{self.executable}_args", "r") as args_file:
-            return args_file.readlines()
-
-
-@dataclass
-class SystemMocks:
-    tmp_path: Path
-    monkeypatch: MonkeyPatch
-    request: FixtureRequest
-
-    def binary(self, executable: str) -> Mock:
-        bin_dir = self.tmp_path / "bin"
-        bin_dir.mkdir(exist_ok=True)
-        _ = shutil.copy2("./bin/stub", bin_dir / executable)
-        self.monkeypatch.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
-        out_path = self.tmp_path / "out"
-        self.monkeypatch.setenv("OUT_DIR", str(out_path))
-        self.monkeypatch.setenv("MOCKS_DIR", f"./mocks/{self.request.node.name}")
-        return Mock(out_path, executable)
-
-    def home(self) -> None:
-        home = self.tmp_path / "home"
-        home.mkdir()
-        self.monkeypatch.setenv("HOME", str(home))
