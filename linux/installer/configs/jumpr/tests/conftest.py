@@ -54,3 +54,9 @@ def system_mocks(
     monkeypatch: MonkeyPatch, tmp_path: Path, request: FixtureRequest
 ) -> SystemMocks:
     return SystemMocks(tmp_path, monkeypatch, request)
+
+
+@pytest.fixture(autouse=True)
+def prepare_directories(system_mocks: SystemMocks):
+    system_mocks.data_dirs()
+    system_mocks.home()
