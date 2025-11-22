@@ -1,3 +1,4 @@
+from ast import arg
 from dataclasses import dataclass
 import subprocess
 
@@ -30,7 +31,11 @@ def test_launch_application(system_mocks: SystemMocks) -> None:
 
     # then
     assert len(gdbus.received_args()) == 1
-    assert len(gtk_launch.received_args()) == 1
+    launch_args = gtk_launch.received_args()
+    assert len(launch_args) == 1
+    assert _parse(GtkLaunchArgs, launch_args[0]) == GtkLaunchArgs(
+        desktop_file="my-application.desktop"
+    )
 
 
 def _run_jumpr(system_mocks: SystemMocks, query: str) -> None:
@@ -48,6 +53,11 @@ def _run_jumpr(system_mocks: SystemMocks, query: str) -> None:
 
 def _parse(type: type[DataclassT], args: str) -> DataclassT:
     return simple_parsing.parse(type, args=args)
+
+
+@dataclass
+class GtkLaunchArgs:
+    desktop_file: str = simple_parsing.field(positional=True)
 
 
 @dataclass

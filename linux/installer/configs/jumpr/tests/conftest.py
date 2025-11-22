@@ -34,7 +34,7 @@ class SystemMocks:
         self.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
         out_path = self.tmp_path / "out"
         self.setenv("OUT_DIR", str(out_path))
-        self.setenv("MOCKS_DIR", f"./mocks/{self.request.node.name}")
+        self.setenv("MOCKS_DIR", f"./mocks/{self._test_name()}")
         return Mock(out_path, executable)
 
     def home(self) -> None:
@@ -44,13 +44,17 @@ class SystemMocks:
 
     def data_dirs(self) -> None:
         data_root = self.tmp_path / "data"
-        data_home = data_root / "home"
+        data_home_stub = (Path("./mocks") / self._test_name() / "data_home").absolute()
+        data_home = data_home_stub if data_home_stub.is_dir() else data_root / "home"
         data_dirs = data_root / "dirs"
         self.setenv("XDG_DATA_HOME", str(data_home))
         self.setenv("XDG_DATA_DIRS", str(data_dirs))
 
     def setenv(self, name: str, value: str) -> None:
         self.monkeypatch.setenv(name, value)
+
+    def _test_name(self) -> str:
+        return self.request.node.name
 
 
 @pytest.fixture
