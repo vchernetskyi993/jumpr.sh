@@ -38,8 +38,10 @@ class SystemMocks:
         return Mock(out_path, executable)
 
     def home(self) -> None:
-        home = self.tmp_path / "home"
-        home.mkdir()
+        home_stub = (Path("./mocks") / self._test_name() / "home").absolute()
+        home = home_stub if home_stub.is_dir() else self.tmp_path / "home"
+        if not home.is_dir():
+            home.mkdir()
         self.setenv("HOME", str(home))
 
     def data_dirs(self) -> None:

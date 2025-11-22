@@ -24,7 +24,7 @@ def test_duplicate_desktop_files() -> None:
     # then
     assert (
         result
-        == "app:my-application.desktop\x1fapp: My Application \x1b[90m# my-application Home;\x1b[0m\n"
+        == "app:my-application.desktop\x1f\x1b[38;5;218m\U000f08c6\x1b[0m app: My Application \x1b[90m# my-application Home;\x1b[0m\n"
     )
 
 
@@ -36,10 +36,21 @@ def test_no_display() -> None:
     assert result == ""
 
 
+def test_application_cache() -> None:
+    # when
+    result = _list_applications()
+
+    # then
+    assert (
+        result
+        == "app:my-application.desktop\x1f\x1b[38;5;218m\U000f08c6\x1b[0m app: My Application \x1b[90m# my-application Home;\x1b[0m\n"
+    )
+
+
 def _list_applications() -> str:
     # when
     result = subprocess.run(
-        ["/bin/bash", "-c", "source ../jumpr.sh && list-applications"],
+        ["/bin/bash", "-c", "source ../jumpr.sh && list-applications-cached"],
         capture_output=True,
         text=True,
     )

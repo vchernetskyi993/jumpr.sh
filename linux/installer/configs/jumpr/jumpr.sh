@@ -17,7 +17,10 @@ function main() {
 function list-all() {
     list-windows | prefix-symbol ''
     list-commands | prefix-symbol ''
+    list-applications-cached
+}
 
+function list-applications-cached() {
     if [[ ! -s "$APPS_CACHE" ]]; then
         mkdir -p "$CACHE_DIR"
         list-applications | prefix-symbol '󰣆' | tee "$APPS_CACHE"
