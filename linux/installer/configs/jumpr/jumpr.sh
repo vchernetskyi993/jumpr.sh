@@ -38,7 +38,7 @@ function list-applications() {
         map list-desktop-files |               # list all desktop files
         awk -F/ '!seen[$NF]++' |               # unique base names
         tr '\n' '\0' |                         # replace linebreak with null
-        xargs -0 awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
+        xargs -0r awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
 }
 
 function list-desktop-files() {
