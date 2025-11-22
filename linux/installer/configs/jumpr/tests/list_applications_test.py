@@ -28,6 +28,14 @@ def test_duplicate_desktop_files() -> None:
     )
 
 
+def test_no_display() -> None:
+    # when
+    result = _list_applications()
+
+    # then
+    assert result == ""
+
+
 def _list_applications() -> str:
     # when
     result = subprocess.run(
