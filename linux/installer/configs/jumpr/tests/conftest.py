@@ -13,7 +13,11 @@ class Mock:
     executable: str
 
     def received_args(self) -> list[str]:
-        with open(self.out_path / f"{self.executable}_args", "r") as args_file:
+        args_path = self.out_path / f"{self.executable}_args"
+        if not args_path.is_file():
+            return []
+
+        with args_path.open("r") as args_file:
             return args_file.readlines()
 
 

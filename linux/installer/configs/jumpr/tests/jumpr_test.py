@@ -10,7 +10,32 @@ from conftest import SystemMocks
 def test_switch_windows(system_mocks: SystemMocks) -> None:
     # given
     gdbus = system_mocks.binary("gdbus")
-    system_mocks.setenv("FZF_DEFAULT_OPTS", "--query 'My Window' --exact -1 -0")
+
+    # when
+    _run_jumpr(system_mocks, "My Window")
+
+    # then
+    args = gdbus.received_args()
+    assert len(args) == 2
+    assert _parse(GDBusArgs, args[1]) == _activate_window(12345)
+
+
+def test_launch_application(system_mocks: SystemMocks) -> None:
+    # given
+    gdbus = system_mocks.binary("gdbus")
+    gtk_launch = system_mocks.binary("gtk-launch")
+
+    # when
+    _run_jumpr(system_mocks, "My Application")
+
+    # then
+    assert len(gdbus.received_args()) == 1
+    assert len(gtk_launch.received_args()) == 1
+
+
+def _run_jumpr(system_mocks: SystemMocks, query: str) -> None:
+    # given
+    system_mocks.setenv("FZF_DEFAULT_OPTS", f"--query '{query}' --exact -1 -0")
 
     # when
     result = subprocess.run(["../jumpr.sh"], capture_output=True, text=True)
@@ -19,10 +44,6 @@ def test_switch_windows(system_mocks: SystemMocks) -> None:
     assert result.returncode == 0
     assert result.stderr == ""
     assert result.stdout == ""
-
-    args = gdbus.received_args()
-    assert len(args) == 2
-    assert _parse(GDBusArgs, args[1]) == _activate_window(12345)
 
 
 def _parse(type: type[DataclassT], args: str) -> DataclassT:
