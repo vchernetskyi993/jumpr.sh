@@ -85,7 +85,7 @@ function list-windows() {
         ' |
         tac |
         {
-            read -r first
+            read -r first || exit 0
             cat
             echo "$first"
         }
