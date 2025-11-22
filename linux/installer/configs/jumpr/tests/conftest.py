@@ -27,16 +27,16 @@ class SystemMocks:
         bin_dir = self.tmp_path / "bin"
         bin_dir.mkdir(exist_ok=True)
         _ = shutil.copy2("./bin/stub", bin_dir / executable)
-        self.monkeypatch.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
+        self.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
         out_path = self.tmp_path / "out"
-        self.monkeypatch.setenv("OUT_DIR", str(out_path))
-        self.monkeypatch.setenv("MOCKS_DIR", f"./mocks/{self.request.node.name}")
+        self.setenv("OUT_DIR", str(out_path))
+        self.setenv("MOCKS_DIR", f"./mocks/{self.request.node.name}")
         return Mock(out_path, executable)
 
     def home(self) -> None:
         home = self.tmp_path / "home"
         home.mkdir()
-        self.monkeypatch.setenv("HOME", str(home))
+        self.setenv("HOME", str(home))
 
     def setenv(self, name: str, value: str) -> None:
         self.monkeypatch.setenv(name, value)
