@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=My Application
+GenericName=My Application
+Exec=my-app
+Type=Application
+Keywords=Root;
+Categories=Utility;
+StartupNotify=false

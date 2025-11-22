@@ -46,12 +46,20 @@ class SystemMocks:
         data_root = self.tmp_path / "data"
         data_home_stub = (Path("./mocks") / self._test_name() / "data_home").absolute()
         data_home = data_home_stub if data_home_stub.is_dir() else data_root / "home"
-        data_dirs = data_root / "dirs"
+        data_dirs_stub = (Path("./mocks") / self._test_name() / "data_dirs").absolute()
+        data_dirs = (
+            self._list_children_directories(data_dirs_stub)
+            if data_dirs_stub.is_dir()
+            else str(data_root / "dirs")
+        )
         self.setenv("XDG_DATA_HOME", str(data_home))
-        self.setenv("XDG_DATA_DIRS", str(data_dirs))
+        self.setenv("XDG_DATA_DIRS", data_dirs)
 
     def setenv(self, name: str, value: str) -> None:
         self.monkeypatch.setenv(name, value)
+
+    def _list_children_directories(self, directory: Path) -> str:
+        return ":".join([str(p) for p in directory.iterdir() if p.is_dir()])
 
     def _test_name(self) -> str:
         return self.request.node.name
