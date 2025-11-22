@@ -11,7 +11,7 @@ def test_switch_windows(system_mocks: SystemMocks) -> None:
     # given
     gdbus = system_mocks.binary("gdbus")
     system_mocks.setenv("FZF_DEFAULT_OPTS", "--query 'My Window' --exact -1 -0")
-    # TODO: mock applications
+    system_mocks.data_dirs()
     system_mocks.home()
 
     # when

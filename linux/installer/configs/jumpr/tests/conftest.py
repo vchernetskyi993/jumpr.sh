@@ -38,6 +38,13 @@ class SystemMocks:
         home.mkdir()
         self.setenv("HOME", str(home))
 
+    def data_dirs(self) -> None:
+        data_root = self.tmp_path / "data"
+        data_home = data_root / "home"
+        data_dirs = data_root / "dirs"
+        self.setenv("XDG_DATA_HOME", str(data_home))
+        self.setenv("XDG_DATA_DIRS", str(data_dirs))
+
     def setenv(self, name: str, value: str) -> None:
         self.monkeypatch.setenv(name, value)
 
