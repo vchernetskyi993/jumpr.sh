@@ -26,7 +26,7 @@ function list-applications-cached() {
         list-applications | prefix-symbol '󰣆' | tee "$APPS_CACHE"
     else
         cat "$APPS_CACHE"
-    fi 
+    fi
 }
 
 function list-applications() {
@@ -35,12 +35,12 @@ function list-applications() {
     local all_dirs="$data_home:$data_dirs"
 
     echo "$all_dirs" |
-        tr ':' '\n' |                          # split on ':'
-        sed 's:/*$:/applications:' |           # append /applications
-        filter is-dir |                        # remove non-existing directories
-        map list-desktop-files |               # list all desktop files
-        awk -F/ '!seen[$NF]++' |               # unique base names
-        tr '\n' '\0' |                         # replace linebreak with null
+        tr ':' '\n' |                           # split on ':'
+        sed 's:/*$:/applications:' |            # append /applications
+        filter is-dir |                         # remove non-existing directories
+        map list-desktop-files |                # list all desktop files
+        awk -F/ '!seen[$NF]++' |                # unique base names
+        tr '\n' '\0' |                          # replace linebreak with null
         xargs -0r awk -F= "$PRINT_APPLICATIONS" # collect meta from file and print
 }
 
@@ -78,9 +78,19 @@ PRINT_APPLICATIONS='
 
 function list-windows() {
     window-command List |
-        sed 's/\\\"/\"/g' |
-        sed "s/^(\(.*\),)$/\1/" |
-        sed 's/^.\(.*\).$/\1/' |
+        sed -e '
+            # Replace \" with "
+            s/\\"/"/g
+
+            # Replace \\ with \
+            s/\\\\/\\/g
+
+            # Strip tuple parenthesis ( <JSON> ,)
+            s/^(\(.*\),)$/\1/
+
+            # Strip double/single wrapping quotes "<JSON>"
+            s/^.\(.*\).$/\1/
+        ' |
         jq -r '
             .[] | 
                 select(.wm_class != "jumpr") |
