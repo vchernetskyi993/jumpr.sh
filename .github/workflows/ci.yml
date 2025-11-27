@@ -1,0 +1,12 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run the sh-checker
+        uses: luizm/action-sh-checker@v0.9.0
