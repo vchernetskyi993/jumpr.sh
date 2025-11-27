@@ -50,7 +50,7 @@ def test_application_cache() -> None:
 def _list_applications() -> str:
     # when
     result = subprocess.run(
-        ["/bin/bash", "-c", "source ../jumpr.sh && list-applications-cached"],
+        ["/bin/bash", "-c", "source ./jumpr.sh && list-applications-cached"],
         capture_output=True,
         text=True,
     )

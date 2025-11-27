@@ -1,4 +1,3 @@
-from ast import arg
 from dataclasses import dataclass
 import subprocess
 
@@ -43,7 +42,7 @@ def _run_jumpr(system_mocks: SystemMocks, query: str) -> None:
     system_mocks.setenv("FZF_DEFAULT_OPTS", f"--query '{query}' --exact -1 -0")
 
     # when
-    result = subprocess.run(["../jumpr.sh"], capture_output=True, text=True)
+    result = subprocess.run(["./jumpr.sh"], capture_output=True, text=True)
 
     # then
     assert result.returncode == 0

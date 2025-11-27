@@ -49,7 +49,7 @@ def test_window_with_both_quotes(system_mocks: SystemMocks) -> None:
 
 def _list_windows() -> str:
     result = subprocess.run(
-        ["/bin/bash", "-c", "source ../jumpr.sh && list-windows"],
+        ["/bin/bash", "-c", "source ./jumpr.sh && list-windows"],
         capture_output=True,
         text=True,
     )

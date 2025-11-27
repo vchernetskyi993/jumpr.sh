@@ -30,15 +30,15 @@ class SystemMocks:
     def binary(self, executable: str) -> Mock:
         bin_dir = self.tmp_path / "bin"
         bin_dir.mkdir(exist_ok=True)
-        _ = shutil.copy2("./bin/stub", bin_dir / executable)
+        _ = shutil.copy2("./tests/bin/stub", bin_dir / executable)
         self.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
         out_path = self.tmp_path / "out"
         self.setenv("OUT_DIR", str(out_path))
-        self.setenv("MOCKS_DIR", f"./mocks/{self._test_name()}")
+        self.setenv("MOCKS_DIR", f"./tests/mocks/{self._test_name()}")
         return Mock(out_path, executable)
 
     def home(self) -> None:
-        home_stub = (Path("./mocks") / self._test_name() / "home").absolute()
+        home_stub = (Path("./tests/mocks") / self._test_name() / "home").absolute()
         home = home_stub if home_stub.is_dir() else self.tmp_path / "home"
         if not home.is_dir():
             home.mkdir()
@@ -46,9 +46,9 @@ class SystemMocks:
 
     def data_dirs(self) -> None:
         data_root = self.tmp_path / "data"
-        data_home_stub = (Path("./mocks") / self._test_name() / "data_home").absolute()
+        data_home_stub = (Path("./tests/mocks") / self._test_name() / "data_home").absolute()
         data_home = data_home_stub if data_home_stub.is_dir() else data_root / "home"
-        data_dirs_stub = (Path("./mocks") / self._test_name() / "data_dirs").absolute()
+        data_dirs_stub = (Path("./tests/mocks") / self._test_name() / "data_dirs").absolute()
         data_dirs = (
             self._list_children_directories(data_dirs_stub)
             if data_dirs_stub.is_dir()
