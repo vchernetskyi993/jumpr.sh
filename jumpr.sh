@@ -148,13 +148,13 @@ function symbol() {
 }
 
 function search-prompt() {
-    # TODO: setup on login
     # Theme
-    export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
+    export FZF_DEFAULT_OPTS="
         --color='fg:#f2f4f8,bg:#161616,hl:#be95ff' \
         --color='fg+:#f2f4f8,bg+:#2a2a2a,hl+:#be95ff' \
         --color='info:#ff91c1,prompt:#ee5396,pointer:#f4a261' \
-        --color='marker:#be95ff,spinner:#be95ff,header:#be95ff'"
+        --color='marker:#be95ff,spinner:#be95ff,header:#be95ff' \
+        $FZF_DEFAULT_OPTS"
 
     export -f close-window
     export -f window-command
@@ -168,7 +168,7 @@ function search-prompt() {
     export -f symbol
 
     # Vim Bindings
-    export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
+    export FZF_DEFAULT_OPTS="
         --bind 'start:unbind(j,k,i,D,G)' \
         --bind 'j:down,k:up,i:show-input+unbind(j,k,i,D,G),D:execute-silent(close-window {1})+reload(list-all),G:first' \
         --bind 'esc,ctrl-c:transform:
@@ -177,7 +177,8 @@ function search-prompt() {
           else
             echo abort
           fi
-        '"
+        ' \
+        $FZF_DEFAULT_OPTS"
 
     fzf --accept-nth=1 -d $'\x1f' --with-nth=2 \
         --tiebreak=index \
