@@ -16,7 +16,7 @@ def test_switch_windows(system_mocks: SystemMocks) -> None:
 
     # then
     args = gdbus.received_args()
-    assert len(args) == 2
+    assert len(args) is 2
     assert _parse(GDBusArgs, args[1]) == _activate_window(12345)
 
 
