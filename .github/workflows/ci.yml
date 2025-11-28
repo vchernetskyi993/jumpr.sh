@@ -25,10 +25,14 @@ jobs:
           cache: 'pip'
       - name: Python - Dependencies
         run: pip install -r requirements.txt
-      - name: OS Dependendencies
+      - name: Install fzf
+        env:
+          FZF_VERSION: "0.59.0"
         run: |
-          sudo apt-get update
-          sudo apt-get install -y fzf
-          fzf --version
+          curl -sSL \
+            "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_amd64.tar.gz" \
+            -o /tmp/fzf.tgz
+          tar -xzf /tmp/fzf.tgz -C /tmp
+          sudo mv /tmp/fzf /usr/local/bin/
       - name: Python - Tests
         run: pytest
