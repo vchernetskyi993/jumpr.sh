@@ -59,4 +59,3 @@ def _list_applications() -> str:
     assert result.returncode == 0
     assert result.stderr == ""
     return result.stdout
-

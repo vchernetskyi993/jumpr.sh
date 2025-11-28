@@ -46,9 +46,13 @@ class SystemMocks:
 
     def data_dirs(self) -> None:
         data_root = self.tmp_path / "data"
-        data_home_stub = (Path("./tests/mocks") / self._test_name() / "data_home").absolute()
+        data_home_stub = (
+            Path("./tests/mocks") / self._test_name() / "data_home"
+        ).absolute()
         data_home = data_home_stub if data_home_stub.is_dir() else data_root / "home"
-        data_dirs_stub = (Path("./tests/mocks") / self._test_name() / "data_dirs").absolute()
+        data_dirs_stub = (
+            Path("./tests/mocks") / self._test_name() / "data_dirs"
+        ).absolute()
         data_dirs = (
             self._list_children_directories(data_dirs_stub)
             if data_dirs_stub.is_dir()
