@@ -25,5 +25,8 @@ jobs:
           cache: 'pip'
       - name: Python - Dependencies
         run: pip install -r requirements.txt
+      - name: OS Dependendencies
+        run: apt install fzf
+      - run: fzf --version
       - name: Python - Tests
         run: pytest
