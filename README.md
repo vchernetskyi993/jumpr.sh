@@ -5,7 +5,7 @@
 ---
 
 Fuzzy search and execute prepopulated system actions from the CLI:
-* Switch windows
+* Switch and close windows
 * Launch applications
 * Run system commands
 
