@@ -1,5 +1,5 @@
 <div align=center>
-  <img width="128" height="128" alt="jumpr" src="https://github.com/user-attachments/assets/2805506a-5052-49ee-988f-d408afa21bf2" />
+  <img width="512" alt="jumpr" src="https://github.com/user-attachments/assets/4d241d7f-c2ac-4b64-8e8b-b5f70ffeb919" />
 </div>
 
 ---
