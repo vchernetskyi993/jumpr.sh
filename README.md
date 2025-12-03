@@ -22,6 +22,19 @@ Using the Gnome desktop, I started feeling that Alt-Tabbing is suboptimal compar
 
 ## Installation
 
+Script dependencies:
+* Gnome
+* systemctl
+* [window-calls](https://github.com/ickyicky/window-calls)
+* [fzf](https://github.com/junegunn/fzf) >= 0.60.3
+* [jq](https://github.com/jqlang/jq)
+* (For the icons) [nerd-fonts](https://github.com/ryanoasis/nerd-fonts)
+
+Installer dependencies:
+* [kitty](https://github.com/kovidgoyal/kitty) >= 0.42.0
+
+After installing all those, run: `./install.sh`
+
 ## Bindings
 
 All standard `fzf` ones plus:
