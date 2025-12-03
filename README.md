@@ -15,7 +15,7 @@ Fuzzy search and execute prepopulated system actions from the CLI:
 
 ## Motivation
 
-Using the Gnome desktop, I started feeling that Alt-Tabbing is suboptimal compared to switching windows via search. None of the existing solutions fully met my expectations:
+Using the Gnome desktop, I started feeling that Alt-Tabbing is suboptimal compared to switching windows via search. Jumpr was born since none of the existing solutions fully met my expectations:
 * [windows-search-provider](https://github.com/G-dH/windows-search-provider) - felt cumbersome to tab to a window, since windows are always _after_ applications in the list.
 * [switcher](https://github.com/daniellandau/switcher) - the main conceptual drawback for me was the fact that Switcher view is not a window itself and stuff like window-scoped layout doesn't work in it.
 * [rofi](https://github.com/davatorium/rofi), [Ulauncher](https://github.com/Ulauncher/Ulauncher), and other generic switchers - not switching windows with Gnome on Wayland.
