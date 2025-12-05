@@ -13,6 +13,13 @@ Fuzzy search and execute prepopulated system actions from the CLI:
   <img width="1441" height="792" alt="image" src="https://github.com/user-attachments/assets/4be7577b-addf-4982-8190-3b8582ff37a5" />
 </div>
 
+## Table of Contents
+
+- [Motivation](#motivation)
+- [Installation](#installation)
+- [Bindings](#bindings)
+- [Uninstalling](#uninstalling)
+
 ## Motivation
 
 Using the Gnome desktop, I started feeling that Alt-Tabbing is suboptimal compared to switching windows via search. Jumpr was born since none of the existing solutions fully met my expectations:
@@ -33,7 +40,7 @@ Script dependencies:
 Installer dependencies:
 * [kitty](https://github.com/kovidgoyal/kitty) >= 0.42.0
 
-After installing all those, run: `./install.sh`
+After installing all those, run: `./installer.sh install`
 
 ## Bindings
 
@@ -47,4 +54,8 @@ All standard `fzf` ones plus:
     * `G` to go to the first item
 
 Simple customizations can be added using `FZF_DEFAULT_OPTS="--bind '...'"` option.
+
+## Uninstalling
+
+To clean up all files populated by the installer, run `./installer.sh uninstall`.
 

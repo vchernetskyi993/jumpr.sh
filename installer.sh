@@ -1,6 +1,33 @@
 #!/bin/bash
 
 function main() {
+    if [[ $# -eq 0 ]]; then
+        help >&2
+        exit 2
+    fi
+
+    case "${1:-}" in
+    install)
+        shift
+        install "$@"
+        ;;
+    uninstall)
+        shift
+        uninstall "$@"
+        ;;
+    -h | --help | help)
+        help
+        ;;
+    *)
+        echo "Unknown command: $1" >&2
+        help >&2
+        exit 2
+        ;;
+    esac
+}
+
+function install() {
+    echo "Installing Jumpr"
     BASE_PATH=$(dirname "$0")
     CONFIGS_PATH=$BASE_PATH/installer
 
@@ -43,7 +70,12 @@ function main() {
     update-desktop-database || true
 }
 
+function uninstall() {
+    echo "Uninstalling Jumpr"
+}
+
 function verify-dependencies() {
+    echo "Verifying dependencies"
     verify-binaries
     verify-versions
     verify-extensions
@@ -138,6 +170,15 @@ function ok-msg() {
     local GREEN='\033[0;32m'
     local NC='\033[0m'
     echo -e "${GREEN}OK:${NC} $1"
+}
+
+function help() {
+    cat <<'EOF'
+Usage:
+  script.sh install      Install window-calls (or whatever you install)
+  script.sh uninstall    Uninstall it
+  script.sh -h|--help    Show this help
+EOF
 }
 
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] || main "$@"
