@@ -1,5 +1,12 @@
 #!/bin/bash
 
+BIN_PATH=$HOME/.local/bin/jumpr
+DAEMON_FILE=jumpr-daemon.service
+DAEMON_PATH="$HOME"/.config/systemd/user/$DAEMON_FILE
+DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+LOGO_PATH=$DATA_HOME/icons/jumpr.png
+DESKTOP_PATH=$DATA_HOME/applications/jumpr.desktop
+
 function main() {
     if [[ $# -eq 0 ]]; then
         help >&2
@@ -33,17 +40,22 @@ function install() {
 
     verify-dependencies
 
-    exit 0
-
-    echo "Copying script"
-    cp -f \
-        $CONFIGS_PATH/jumpr.sh \
-        $HOME/.local/bin/jumpr
+    echo "Copying binary"
+    copy "$BASE_PATH"/jumpr.sh "$BIN_PATH"
 
     echo "Setting daemon service"
-    cp -f $CONFIGS_PATH/jumpr-daemon.service $HOME/.config/systemd/user/
+    copy "$CONFIGS_PATH"/jumpr-daemon.service "$DAEMON_PATH"
     systemctl --user daemon-reload
-    systemctl --user enable --now jumpr-daemon.service
+    systemctl --user enable --now $DAEMON_FILE
+
+    echo "Copying icon"
+    copy "$CONFIGS_PATH"/jumpr.png "$LOGO_PATH"
+
+    echo "Creating desktop file"
+    copy "$CONFIGS_PATH"/jumpr.desktop "$DESKTOP_PATH"
+    update-desktop-database || true
+
+    exit 0
 
     echo "Setting shortcut"
     gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
@@ -51,27 +63,14 @@ function install() {
     gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" command "'kitty --class=jumpr -1 --instance-group=jumpr jumpr'"
     gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" name "'App Switcher'"
 
-    LOGO_DIR=$HOME/.local/share/icons/
-    LOGO_FILE=jumpr.png
-    if [[ -f $LOGO_DIR/$LOGO_FILE ]]; then
-        echo "Logo already exists"
-    else
-        echo "Downloading custom logo from drive"
-        LOCAL_DRIVE=$HOME/GoogleDrive
-        mkdir -p $LOCAL_DRIVE
-        rclone sync google-drive:/$LOGO_FILE $LOCAL_DRIVE
-
-        mkdir -p $LOGO_DIR
-        cp $LOCAL_DRIVE/$LOGO_FILE $LOGO_DIR
-    fi
-
-    echo "Creating desktop file"
-    cp -f $CONFIGS_PATH/jumpr.desktop $HOME/.local/share/applications
-    update-desktop-database || true
 }
 
 function uninstall() {
     echo "Uninstalling Jumpr"
+    remove "$BIN_PATH"
+    remove "$DAEMON_PATH"
+    remove "$LOGO_PATH"
+    remove "$DESKTOP_PATH"
 }
 
 function verify-dependencies() {
@@ -158,6 +157,17 @@ function verify-extensions() {
     fail-msg "window-calls extension not detected (not installed or not running)."
     echo "Please, install and enable extension"
     exit 1
+}
+
+function copy() {
+    echo "    $1 -> $2"
+    mkdir -p "$(dirname "$1")"
+    cp -f "$1" "$2"
+}
+
+function remove() {
+    echo "Removing $1"
+    rm -f "$1"
 }
 
 function fail-msg() {
