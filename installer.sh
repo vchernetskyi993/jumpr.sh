@@ -55,7 +55,7 @@ function install() {
 
     stage "Creating desktop file"
     copy "$CONFIGS_PATH"/jumpr.desktop "$DESKTOP_PATH"
-    update-desktop-database &> /dev/null || true
+    update-desktop-database &>/dev/null || true
 
     set-shortcut
 }
