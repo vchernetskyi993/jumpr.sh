@@ -58,4 +58,5 @@ Simple customizations can be added using `FZF_DEFAULT_OPTS="--bind '...'"` optio
 ## Uninstalling
 
 To clean up all files populated by the installer, run `./installer.sh uninstall`.
+* **Note** that at the moment shortcut needs to be removed manually.
 
