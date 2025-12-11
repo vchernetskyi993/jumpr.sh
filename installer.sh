@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 BIN_PATH=$HOME/.local/bin/jumpr
 DAEMON_FILE=jumpr-daemon.service
@@ -6,6 +7,7 @@ DAEMON_PATH="$HOME"/.config/systemd/user/$DAEMON_FILE
 DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 LOGO_PATH=$DATA_HOME/icons/jumpr.png
 DESKTOP_PATH=$DATA_HOME/applications/jumpr.desktop
+SHORTCUT="<Super>Return"
 
 function main() {
     if [[ $# -eq 0 ]]; then
@@ -40,29 +42,22 @@ function install() {
 
     verify-dependencies
 
-    echo "Copying binary"
+    stage "Copying binary"
     copy "$BASE_PATH"/jumpr.sh "$BIN_PATH"
 
-    echo "Setting daemon service"
+    stage "Setting daemon service"
     copy "$CONFIGS_PATH"/jumpr-daemon.service "$DAEMON_PATH"
     systemctl --user daemon-reload
     systemctl --user enable --now $DAEMON_FILE
 
-    echo "Copying icon"
+    stage "Copying icon"
     copy "$CONFIGS_PATH"/jumpr.png "$LOGO_PATH"
 
-    echo "Creating desktop file"
+    stage "Creating desktop file"
     copy "$CONFIGS_PATH"/jumpr.desktop "$DESKTOP_PATH"
-    update-desktop-database || true
+    update-desktop-database &> /dev/null || true
 
-    exit 0
-
-    echo "Setting shortcut"
-    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
-    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" binding "'<Super>Return'"
-    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" command "'kitty --class=jumpr -1 --instance-group=jumpr jumpr'"
-    gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" name "'App Switcher'"
-
+    set-shortcut
 }
 
 function uninstall() {
@@ -71,10 +66,11 @@ function uninstall() {
     remove "$DAEMON_PATH"
     remove "$LOGO_PATH"
     remove "$DESKTOP_PATH"
+    # TODO: unset shortcut
 }
 
 function verify-dependencies() {
-    echo "Verifying dependencies"
+    stage "Verifying dependencies"
     verify-binaries
     verify-versions
     verify-extensions
@@ -170,16 +166,41 @@ function remove() {
     rm -f "$1"
 }
 
+function set-shortcut() {
+    stage "Setting shortcut"
+    SHORTCUT_MANAGER_URL=https://raw.githubusercontent.com/vchernetskyi993/gnome-shortcuts-cli/refs/heads/main/command.sh
+    SHORTCUT_MANAGER=$BASE_PATH/gnome-shortcuts.sh
+    if [ ! -f "$SHORTCUT_MANAGER" ]; then
+        curl -sL \
+            $SHORTCUT_MANAGER_URL \
+            -o "$SHORTCUT_MANAGER"
+        chmod +x "$SHORTCUT_MANAGER"
+        echo "    $SHORTCUT_MANAGER_URL -> $SHORTCUT_MANAGER"
+    else
+        echo "    Using existing shortcut manager binary: $SHORTCUT_MANAGER"
+    fi
+    "$SHORTCUT_MANAGER" \
+        "Jumpr" \
+        "kitty --class=jumpr -1 --instance-group=jumpr jumpr" \
+        "$SHORTCUT" | sed 's/^/    /'
+}
+
 function fail-msg() {
     local RED='\033[0;31m'
     local NC='\033[0m'
-    echo -e "${RED}FAIL:${NC} $1" >&2
+    echo -e "    ${RED}FAIL:${NC} $1" >&2
 }
 
 function ok-msg() {
     local GREEN='\033[0;32m'
     local NC='\033[0m'
-    echo -e "${GREEN}OK:${NC} $1"
+    echo -e "    ${GREEN}OK:${NC} $1"
+}
+
+function stage() {
+    local BLUE='\033[0;34m'
+    local NC='\033[0m'
+    echo -e "  ${BLUE}$1${NC}"
 }
 
 function help() {
