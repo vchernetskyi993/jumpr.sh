@@ -29,6 +29,8 @@ Using the Gnome desktop, I started feeling that Alt-Tabbing is suboptimal compar
 
 ## Installation
 
+### 1. Install dependencies manually
+
 Script dependencies:
 * Gnome
 * systemctl
@@ -40,7 +42,11 @@ Script dependencies:
 Installer dependencies:
 * [kitty](https://github.com/kovidgoyal/kitty) >= 0.42.0
 
+### 2. (Optional) Update configuration
+
 Check the default installer configuration variables located at the top of the [installer.sh](./installer.sh) file and update them if necessary. One configuration option you may want to change is the shortcut key binding, which defaults to `<Super>Return`.
+
+### 3. Run installer
 
 After installing all dependencies and updating the configuration, run `./installer.sh install`
 
