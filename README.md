@@ -40,7 +40,9 @@ Script dependencies:
 Installer dependencies:
 * [kitty](https://github.com/kovidgoyal/kitty) >= 0.42.0
 
-After installing all those, run: `./installer.sh install`
+Check the default installer configuration variables located at the top of the [installer.sh](./installer.sh) file and update them if necessary. One configuration option you may want to change is the shortcut key binding, which defaults to `<Super>Return`.
+
+After installing all dependencies and updating the configuration, run `./installer.sh install`
 
 ## Bindings
 
