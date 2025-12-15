@@ -62,11 +62,21 @@ function install() {
 
 function uninstall() {
     echo "Uninstalling Jumpr"
+
+    stage "Removing binary"
     remove "$BIN_PATH"
+
+    stage "Removing daemon"
     remove "$DAEMON_PATH"
+
+    stage "Removing logo"
     remove "$LOGO_PATH"
+
+    stage "Removing desktop file"
     remove "$DESKTOP_PATH"
-    # TODO: unset shortcut
+
+    BASE_PATH=$(dirname "$0")
+    remove-shortcut
 }
 
 function verify-dependencies() {
@@ -162,12 +172,26 @@ function copy() {
 }
 
 function remove() {
-    echo "Removing $1"
+    echo "    Removing $1"
     rm -f "$1"
 }
 
 function set-shortcut() {
     stage "Setting shortcut"
+    download-shortcut-manager
+    "$SHORTCUT_MANAGER" \
+        "Jumpr" \
+        "kitty --class=jumpr -1 --instance-group=jumpr jumpr" \
+        "$SHORTCUT" | sed 's/^/    /'
+}
+
+function remove-shortcut() {
+    stage "Removing shortcut"
+    download-shortcut-manager
+    "$SHORTCUT_MANAGER" remove "Jumpr" | sed 's/^/    /'
+}
+
+function download-shortcut-manager() {
     SHORTCUT_MANAGER_URL=https://raw.githubusercontent.com/vchernetskyi993/gnome-shortcuts-cli/refs/heads/main/command.sh
     SHORTCUT_MANAGER=$BASE_PATH/gnome-shortcuts.sh
     if [ ! -f "$SHORTCUT_MANAGER" ]; then
@@ -177,12 +201,8 @@ function set-shortcut() {
         chmod +x "$SHORTCUT_MANAGER"
         echo "    $SHORTCUT_MANAGER_URL -> $SHORTCUT_MANAGER"
     else
-        echo "    Using existing shortcut manager binary: $SHORTCUT_MANAGER"
+        echo "    Using existing shortcut manager script: $SHORTCUT_MANAGER"
     fi
-    "$SHORTCUT_MANAGER" \
-        "Jumpr" \
-        "kitty --class=jumpr -1 --instance-group=jumpr jumpr" \
-        "$SHORTCUT" | sed 's/^/    /'
 }
 
 function fail-msg() {
