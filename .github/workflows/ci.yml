@@ -9,11 +9,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Bash - Code Style
-        uses: luizm/action-sh-checker@v0.9.0
+        uses: luizm/action-sh-checker@v0.10.0
         env:
           SHFMT_OPTS: -i 4
-        with:
-          sh_checker_shellcheck_disable: true
       - name: Python - Linting
         uses: astral-sh/ruff-action@v3
       - name: Python - Formatting
