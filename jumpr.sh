@@ -52,6 +52,8 @@ function list-desktop-files() {
 # shellcheck disable=SC2016
 PRINT_APPLICATIONS='
     FNR == 1 {
+        if (file != "" && !nodisplay)
+            printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", file, name, id, keywords)
         file = FILENAME
         sub(/.*\//, "", file)
         id = file
@@ -69,10 +71,9 @@ PRINT_APPLICATIONS='
     $1 == "NoDisplay" && $2 == "true" {
         nodisplay = 1
     }
-    ENDFILE {
-        if (!nodisplay) {
+    END {
+        if (!nodisplay)
             printf("app:%s\x1fapp: %s \033[90m# %s %s\033[0m\n", file, name, id, keywords)
-        }
     }
 '
 
