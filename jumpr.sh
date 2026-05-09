@@ -218,10 +218,10 @@ function process-selection() {
         cmd="${sel#cmd:}"
         case "$cmd" in
         shutdown)
-            systemctl poweroff
+            systemctl poweroff -i
             ;;
         restart)
-            systemctl reboot
+            systemctl reboot -i
             ;;
         logout)
             gnome-session-quit --logout --no-prompt
