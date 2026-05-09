@@ -45,7 +45,7 @@ function list-applications() {
 }
 
 function list-desktop-files() {
-    find "$1" -type f -name '*.desktop'
+    find -L "$1" -type f -name '*.desktop'
 }
 
 # AWK used to speed up, with pure Bash processing is ~10 times longer

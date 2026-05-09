@@ -47,6 +47,17 @@ def test_application_cache() -> None:
     )
 
 
+def test_desktop_file_link() -> None:
+    # when
+    result = _list_applications()
+
+    # then
+    assert (
+        result
+        == "app:my-application.desktop\x1f\x1b[38;5;218m\U000f08c6\x1b[0m app: My Application \x1b[90m# my-application \x1b[0m\n"
+    )
+
+
 def _list_applications() -> str:
     # when
     result = subprocess.run(
