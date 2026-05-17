@@ -7,9 +7,10 @@ Type=simple
 ExecStart=/usr/bin/kitty -1 \
   --start-as=hidden \
   -o font_size=20 \
-  --instance-group=jumpr
+  --instance-group=jumpr \
+  bash --norc --noprofile
 Environment=DISPLAY=%I
-Restart=on-failure
+Restart=always
 RestartSec=2
 
 [Install]
